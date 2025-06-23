@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  claude-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: claude-sandbox:latest
+    container_name: claude-sandbox
+    cap_add:
+      - NET_ADMIN  # Required for iptables/ipset
+    security_opt:
+      - apparmor:unconfined  # Required for iptables on some systems
+    volumes:
+      - ${REPO_PATH:-./workspace}:/workspace/${REPO_NAME:-sandbox}:rw
+      - command-history:/commandhistory
+      - ~/.claude/.credentials.json:/home/node/.claude/.credentials.json:ro
+      - ~/.claude.json:/tmp/.claude.json:ro
+    environment:
+      - TZ=${TZ:-UTC}
+      - REPO_NAME=${REPO_NAME:-sandbox}
+      - REPO_PATH=/workspace/${REPO_NAME:-sandbox}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}
+      - DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
+    stdin_open: true
+    tty: true
+    command: |
+      bash -c "
+        echo 'Copying Claude configuration...'
+        if [ -f /tmp/.claude.json ]; then
+          cp /tmp/.claude.json /home/node/.claude.json
+          chmod 600 /home/node/.claude.json
+        fi
+        echo 'Initializing firewall...'
+        sudo ANTHROPIC_BASE_URL='${ANTHROPIC_BASE_URL}' /usr/local/bin/init-firewall.sh
+        echo 'Firewall initialized. Starting Claude Code environment...'
+        exec /bin/bash
+      "
+
+volumes:
+  command-history:
