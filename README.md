@@ -4,8 +4,6 @@ A Docker-based sandbox environment for running Claude Code with controlled permi
 
 ## Quick Start
 
-### Using Make Commands (Recommended)
-
 1. Build the Docker image:
 ```bash
 make build
@@ -49,41 +47,9 @@ docker exec -it claude-sandbox bash
 ```bash
 # Inside the container
 claude  # Alias for claude-code --yes-to-all
-# Or use the full command:
-claude-code
-# Note: DISABLE_NON_ESSENTIAL_MODEL_CALLS=1 is automatically set
 ```
 
-## Files
-
-- `Dockerfile` - Defines the sandbox environment with Alpine Linux 3.19 and common dev tools
-- `docker-compose.yml` - Safe configuration with limited capabilities
-- `workspace/` - Shared directory between host and container
-
-## Security Levels
-
-### Current Setup (Safe)
-- User has sudo inside container
-- Limited capabilities (SYS_PTRACE, NET_ADMIN)
-- Cannot escape to host system
-- Good for most development tasks
-
-### Privileged Mode (Not Recommended)
-If you need full system access, create a `docker-compose-privileged.yml` with:
-```yaml
-privileged: true
-security_opt:
-  - seccomp:unconfined
-```
-
-⚠️ **Warning**: Privileged mode can potentially affect your host system.
-
-## Stopping the Sandbox
-
+4. Remove container 
 ```bash
 docker-compose down
 ```
-
-## Persistent Files
-
-Any files created in `/workspace` inside the container will be saved in the `./workspace` directory on your host.
