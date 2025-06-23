@@ -30,26 +30,3 @@ make stop
 ```bash
 make clean
 ```
-
-### Manual Docker Commands
-
-1. Build and start the container:
-```bash
-docker-compose up -d
-```
-
-2. Enter the sandbox:
-```bash
-docker exec -it claude-sandbox bash
-```
-
-3. Run Claude Code inside the container:
-```bash
-# Inside the container
-claude  # Alias for claude-code --yes-to-all
-```
-
-4. Remove container 
-```bash
-docker-compose down
-```
