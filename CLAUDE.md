@@ -57,7 +57,7 @@ docker exec -it claude-sandbox bash
 - **Credential Protection**: Claude credentials mounted read-only
 
 ### Key Components
-- **Dockerfile**: Builds Node.js 20 container with Claude Code and development tools
+- **Dockerfile**: Builds Node.js 20 container with Claude Code, development tools, and Rust toolchain
 - **docker-compose.yml**: Orchestrates container with security settings and volume mounts
 - **init-firewall.sh**: Implements iptables/ipset firewall rules
 - **start-with-repo.sh**: Helper script for starting sandbox with repository
@@ -76,3 +76,4 @@ docker exec -it claude-sandbox bash
 - Command history is preserved between container sessions
 - The firewall script verifies its rules on startup (GitHub should work, example.com should fail)
 - Claude is aliased to include `--dangerously-skip-permissions` flag by default
+- Rust toolchain (stable) is pre-installed with cargo and rustc available globally
