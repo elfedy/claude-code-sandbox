@@ -4,9 +4,10 @@ set -euo pipefail
 # Script to start Claude sandbox with a mounted repository
 
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <path-to-repo> [anthropic-base-url]"
+    echo "Usage: $0 <path-to-repo> [anthropic-base-url] [extra-allowed-domains]"
     echo "Example: $0 ~/projects/my-app"
     echo "Example: $0 ~/projects/my-app https://api.anthropic.com"
+    echo "Example: $0 ~/projects/my-app https://api.anthropic.com example.com,api.test.com"
     exit 1
 fi
 
@@ -18,6 +19,12 @@ REPO_NAME=$(basename "$REPO_ABS_PATH")
 if [ $# -ge 2 ]; then
     export ANTHROPIC_BASE_URL="$2"
     echo "Setting ANTHROPIC_BASE_URL to: $ANTHROPIC_BASE_URL"
+fi
+
+# Optional third argument for EXTRA_ALLOWED_DOMAINS
+if [ $# -ge 3 ]; then
+    export EXTRA_ALLOWED_DOMAINS="$3"
+    echo "Setting EXTRA_ALLOWED_DOMAINS to: $EXTRA_ALLOWED_DOMAINS"
 fi
 
 if [ ! -d "$REPO_ABS_PATH" ]; then

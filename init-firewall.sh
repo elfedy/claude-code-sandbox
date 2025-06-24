@@ -86,6 +86,20 @@ if [[ -n "${ANTHROPIC_BASE_URL:-}" ]]; then
     fi
 fi
 
+# Add extra allowed domains from environment variable
+if [[ -n "${EXTRA_ALLOWED_DOMAINS:-}" ]]; then
+    echo "Processing extra allowed domains..."
+    IFS=',' read -ra EXTRA_DOMAINS <<< "$EXTRA_ALLOWED_DOMAINS"
+    for domain in "${EXTRA_DOMAINS[@]}"; do
+        # Trim whitespace
+        domain=$(echo "$domain" | xargs)
+        if [[ -n "$domain" ]]; then
+            echo "Adding extra domain: $domain"
+            ALLOWED_DOMAINS+=("$domain")
+        fi
+    done
+fi
+
 for domain in "${ALLOWED_DOMAINS[@]}"; do
     # Handle wildcards by resolving base domain
     if [[ "$domain" == *"*"* ]]; then

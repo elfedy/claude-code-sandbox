@@ -19,6 +19,9 @@ make run REPO_PATH=/path/to/your/project
 # Run with custom API endpoint
 make run REPO_PATH=/path/to/your/project ANTHROPIC_BASE_URL=https://custom-api.example.com
 
+# Run with extra allowed domains
+make run REPO_PATH=/path/to/your/project EXTRA_ALLOWED_DOMAINS=example.com,api.myservice.com
+
 # Stop the container
 make stop
 
@@ -65,6 +68,7 @@ docker exec -it claude-sandbox bash
 - `REPO_NAME`: Repository name (auto-detected from path)
 - `ANTHROPIC_BASE_URL`: Optional custom API endpoint
 - `DISABLE_NON_ESSENTIAL_MODEL_CALLS=1`: Set by default to reduce API calls
+- `EXTRA_ALLOWED_DOMAINS`: Comma-separated list of additional domains to whitelist in the firewall
 
 ## Development Notes
 

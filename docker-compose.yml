@@ -20,6 +20,7 @@ services:
       - REPO_PATH=/workspace/${REPO_NAME:-sandbox}
       - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}
       - DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
+      - EXTRA_ALLOWED_DOMAINS=${EXTRA_ALLOWED_DOMAINS}
     stdin_open: true
     tty: true
     command: |
@@ -30,7 +31,7 @@ services:
           chmod 600 /home/node/.claude.json
         fi
         echo 'Initializing firewall...'
-        sudo ANTHROPIC_BASE_URL='${ANTHROPIC_BASE_URL}' /usr/local/bin/init-firewall.sh
+        sudo ANTHROPIC_BASE_URL='${ANTHROPIC_BASE_URL}' EXTRA_ALLOWED_DOMAINS='${EXTRA_ALLOWED_DOMAINS}' /usr/local/bin/init-firewall.sh
         echo 'Firewall initialized. Starting Claude Code environment...'
         exec /bin/bash
       "

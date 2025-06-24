@@ -12,8 +12,15 @@ make build
 2. Run with a repository mounted:
 ```bash
 make run REPO_PATH=/path/to/your/repo
-# Or with custom Anthropic API endpoint:
+
+# With custom Anthropic API endpoint:
 make run REPO_PATH=/path/to/your/repo ANTHROPIC_BASE_URL=https://api.anthropic.com
+
+# With extra allowed domains (comma-separated):
+make run REPO_PATH=/path/to/your/repo EXTRA_ALLOWED_DOMAINS=example.com,api.myservice.com
+
+# With both custom API endpoint and extra domains:
+make run REPO_PATH=/path/to/your/repo ANTHROPIC_BASE_URL=https://api.anthropic.com EXTRA_ALLOWED_DOMAINS=example.com,api.myservice.com
 ```
 
 3. View container logs:
