@@ -28,16 +28,7 @@ RUN apt update && apt install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Rust toolchain
-ENV RUSTUP_HOME=/usr/local/rustup \
-    CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:$PATH
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
-    chmod -R a+r $RUSTUP_HOME $CARGO_HOME && \
-    chmod -R a+x $CARGO_HOME/bin && \
-    rustup --version && \
-    cargo --version && \
-    rustc --version
+# Rust will be installed after switching to node user
 
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \
@@ -75,9 +66,19 @@ RUN ARCH=$(dpkg --print-architecture) && \
 # Set up non-root user
 USER node
 
+# Install Rust toolchain in user's home directory
+ENV RUSTUP_HOME=/home/node/.rustup \
+    CARGO_HOME=/home/node/.cargo \
+    PATH=/home/node/.cargo/bin:$PATH
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
+    rustup --version && \
+    cargo --version && \
+    rustc --version
+
 # Configure npm and install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
-ENV PATH=$PATH:/usr/local/share/npm-global/bin
+ENV PATH=/home/node/.cargo/bin:$PATH:/usr/local/share/npm-global/bin
 
 RUN npm install -g @anthropic-ai/claude-code@latest
 
