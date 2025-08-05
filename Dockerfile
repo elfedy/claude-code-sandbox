@@ -45,15 +45,19 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
     && echo "alias claude='claude --dangerously-skip-permissions'" >> "/home/$USERNAME/.bashrc"
 
 # Create workspace and config directories
-RUN mkdir -p /workspace /home/node/.claude && \
-    chown -R node:node /workspace /home/node/.claude
+RUN mkdir -p /workspace /home/node/.claude /opt/host-binaries && \
+    chown -R node:node /workspace /home/node/.claude && \
+    chmod 755 /opt/host-binaries
 
 # Copy firewall initialization script
 COPY init-firewall.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-firewall.sh
 
-# Configure sudo for firewall script
-RUN echo 'node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh' >> /etc/sudoers
+# Configure sudo for firewall script and binary copying
+RUN echo 'node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh' >> /etc/sudoers && \
+    echo 'node ALL=(root) NOPASSWD: /bin/mkdir -p /opt/host-binaries' >> /etc/sudoers && \
+    echo 'node ALL=(root) NOPASSWD: /bin/cp -r /tmp/host-binaries/* /opt/host-binaries/' >> /etc/sudoers && \
+    echo 'node ALL=(root) NOPASSWD: /bin/chmod -R 755 /opt/host-binaries' >> /etc/sudoers
 
 WORKDIR /workspace
 
@@ -76,9 +80,12 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --de
     cargo --version && \
     rustc --version
 
+# Install subxt
+RUN cargo install subxt-cli
+
 # Configure npm and install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
-ENV PATH=/home/node/.cargo/bin:$PATH:/usr/local/share/npm-global/bin
+ENV PATH=/home/node/.cargo/bin:$PATH:/usr/local/share/npm-global/bin:/opt/host-binaries
 
 RUN npm install -g @anthropic-ai/claude-code@latest
 

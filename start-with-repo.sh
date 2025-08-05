@@ -4,10 +4,11 @@ set -euo pipefail
 # Script to start Claude sandbox with a mounted repository
 
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <path-to-repo> [anthropic-base-url] [extra-allowed-domains]"
+    echo "Usage: $0 <path-to-repo> [anthropic-base-url] [extra-allowed-domains] [host-binaries-path]"
     echo "Example: $0 ~/projects/my-app"
     echo "Example: $0 ~/projects/my-app https://api.anthropic.com"
     echo "Example: $0 ~/projects/my-app https://api.anthropic.com example.com,api.test.com"
+    echo "Example: $0 ~/projects/my-app https://api.anthropic.com example.com,api.test.com ~/my-tools/bin"
     exit 1
 fi
 
@@ -25,6 +26,16 @@ fi
 if [ $# -ge 3 ]; then
     export EXTRA_ALLOWED_DOMAINS="$3"
     echo "Setting EXTRA_ALLOWED_DOMAINS to: $EXTRA_ALLOWED_DOMAINS"
+fi
+
+# Optional fourth argument for HOST_BINARIES_PATH
+if [ $# -ge 4 ]; then
+    export HOST_BINARIES_PATH="$4"
+    if [ ! -d "$HOST_BINARIES_PATH" ]; then
+        echo "Error: Host binaries directory '$HOST_BINARIES_PATH' does not exist"
+        exit 1
+    fi
+    echo "Setting HOST_BINARIES_PATH to: $HOST_BINARIES_PATH"
 fi
 
 if [ ! -d "$REPO_ABS_PATH" ]; then

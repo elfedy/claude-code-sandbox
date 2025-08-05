@@ -14,6 +14,7 @@ services:
       - command-history:/commandhistory
       - ~/.claude/.credentials.json:/home/node/.claude/.credentials.json:ro
       - ~/.claude.json:/tmp/.claude.json:ro
+      - ${HOST_BINARIES_PATH:-/dev/null}:/tmp/host-binaries:ro
     environment:
       - TZ=${TZ:-UTC}
       - REPO_NAME=${REPO_NAME:-sandbox}
@@ -21,6 +22,7 @@ services:
       - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}
       - DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
       - EXTRA_ALLOWED_DOMAINS=${EXTRA_ALLOWED_DOMAINS}
+      - HOST_BINARIES_PATH=${HOST_BINARIES_PATH}
     stdin_open: true
     tty: true
     command: |
@@ -29,6 +31,13 @@ services:
         if [ -f /tmp/.claude.json ]; then
           cp /tmp/.claude.json /home/node/.claude.json
           chmod 600 /home/node/.claude.json
+        fi
+        echo 'Copying host binaries...'
+        if [ -d /tmp/host-binaries ] && [ ! -L /tmp/host-binaries ]; then
+          sudo mkdir -p /opt/host-binaries
+          sudo cp -r /tmp/host-binaries/* /opt/host-binaries/ 2>/dev/null || true
+          sudo chmod -R 755 /opt/host-binaries
+          echo 'Host binaries copied to /opt/host-binaries'
         fi
         echo 'Initializing firewall...'
         sudo ANTHROPIC_BASE_URL='${ANTHROPIC_BASE_URL}' EXTRA_ALLOWED_DOMAINS='${EXTRA_ALLOWED_DOMAINS}' /usr/local/bin/init-firewall.sh

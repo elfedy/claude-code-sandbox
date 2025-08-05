@@ -22,6 +22,9 @@ make run REPO_PATH=/path/to/your/project ANTHROPIC_BASE_URL=https://custom-api.e
 # Run with extra allowed domains
 make run REPO_PATH=/path/to/your/project EXTRA_ALLOWED_DOMAINS=example.com,api.myservice.com
 
+# Run with host binaries
+make run REPO_PATH=/path/to/your/project HOST_BINARIES_PATH=/path/to/binaries
+
 # Stop the container
 make stop
 
@@ -69,6 +72,7 @@ docker exec -it claude-sandbox bash
 - `ANTHROPIC_BASE_URL`: Optional custom API endpoint
 - `DISABLE_NON_ESSENTIAL_MODEL_CALLS=1`: Set by default to reduce API calls
 - `EXTRA_ALLOWED_DOMAINS`: Comma-separated list of additional domains to whitelist in the firewall
+- `HOST_BINARIES_PATH`: Optional path to host binaries to copy into container at /opt/host-binaries
 
 ## Development Notes
 
@@ -77,3 +81,16 @@ docker exec -it claude-sandbox bash
 - The firewall script verifies its rules on startup (GitHub should work, example.com should fail)
 - Claude is aliased to include `--dangerously-skip-permissions` flag by default
 - Rust toolchain (stable) is pre-installed with cargo and rustc available globally
+
+### Host Binaries Feature
+When using `HOST_BINARIES_PATH`, binaries from your host machine are:
+- Copied into the container at `/opt/host-binaries` during startup
+- Automatically available in the PATH
+- Isolated from the host system (changes in container don't affect host)
+- Given executable permissions (755)
+
+Example usage:
+```bash
+# If you have custom tools in ~/my-tools/bin
+make run REPO_PATH=/workspace/my-project HOST_BINARIES_PATH=~/my-tools/bin
+```
